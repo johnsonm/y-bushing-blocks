@@ -4,10 +4,12 @@
 // This was initially designed as a set of bushing holders for the
 // HICTOP i3 clone, which has a frog designed for three SCS8UU pillow blocks.
 // This is intended to replace those bearing pillow blocks with 8mm bronze
-// bushings with graphite inserts. It can be adjusted for smaller 8mm
-// oil-impregnated bronze bushings by changing the bushing length (15mm
-// is a common length) and diameters (they may not have a tapered end)
-bushing_l=30; // Length of bushing: [30:Graphite_Inclusions 15:Oil_Impregnated_Bronze]
+// bushings with graphite inserts.
+// Example bushings currently found as:
+// https://www.ebay.com/itm/JDB-Oilless-Graphite-Lubricating-Brass-Bearing-Bushing-Sleeve/142771728854?var=441776630372&hash=item213ddbb1d6:m:mp4EiNuPnJOZJdIyJrTz7tQ
+// https://www.amazon.com/Micromake-Printer-Ultimaker-Graphite-Bearing/dp/B06XV28WHG
+// https://www.amazon.com/uxcell-Self-lubricating-Bushing-Sleeve-Bearings/dp/B076P9PD2B
+bushing_l=30; // Length of bushing: [10-30]
 bushing_d=12; // Bushing diameter
 block_distance=26; // Distance between blocks installed on printer
 
@@ -72,9 +74,12 @@ module clip() {
                 // bushing outer diameter
                 translate([bushing_d/2+bushing_t, bushing_t, bushing_t+rail_d/2])
                     rotate([-90, 0, 0])
-                cylinder(d=bushing_d, h=bushing_l, $fn=60);
+                    cylinder(d=bushing_d, h=bushing_l, $fn=60);
             }
         }
+        %translate([bushing_d/2+bushing_t, bushing_t, bushing_t+rail_d/2])
+            rotate([-90, 0, 0])
+            cylinder(d=bushing_d, h=bushing_l, $fn=60);
     }
 }
 module long() {
