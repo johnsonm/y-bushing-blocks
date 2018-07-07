@@ -9,16 +9,16 @@
 // is a common length) and diameters (they may not have a tapered end)
 rail_d=9; // leave some room around 8mm rail
 bushing_d=12;
-bushing_d2=11.5; // one end of bushing is tapered
 bushing_l=30;
 bushing_t=2;
 clip_t=0.5;
-screw_d=2.5;
+clip_center_l=4;
+screw_d=3.4; // tap for M4 screws — smaller hole than tapping AL
 screw_x=24; // distance between screw centers short dimension
 screw_y_long=2*24 + 26; // 2 * 24 (center to far edge) + 26 (between)
 screw_y_short=18;
 base_thickness=5.5;
-edge_offset=screw_d/2+4;
+edge_offset=screw_d/2+3;
 separation=2;
 
 e=0.01;
@@ -42,10 +42,10 @@ module base(screw_y) {
 }
 module clip() {
     translate([-(bushing_d/2+bushing_t), -(bushing_l/2+bushing_t), base_thickness]) {
+        hull_w=bushing_d+2*bushing_t;
+        hull_l=bushing_l+2*bushing_t;
         difference() {
             hull() {
-                hull_w=bushing_d+2*bushing_t;
-                hull_l=bushing_l+2*bushing_t;
                 cube([hull_w, hull_l, bushing_d+bushing_t-edge_offset]);
                 translate([edge_offset/2, 0, bushing_d+bushing_t-edge_offset])
                     rotate([-90, 0, 0])
@@ -55,17 +55,22 @@ module clip() {
                     cylinder(d=edge_offset, h=hull_l, $fn=24);
             }
             union() {
-                // cut out middle of cube
-                translate([-e, bushing_t+clip_t, 0])
-                    cube([bushing_d+2*bushing_t+2*e, bushing_l-2*clip_t, bushing_d+bushing_t+e]);
+                // cut out top middle of cube either side of side clip
+                translate([-e, bushing_t, 0])
+                    cube([bushing_d+2*bushing_t+2*e, bushing_l/2-clip_center_l/2, bushing_d+bushing_t+e]);
+                translate([-e, bushing_l/2+clip_center_l, 0])
+                    cube([hull_w+2*e, bushing_l/2-clip_center_l/2, bushing_d+bushing_t+e]);
+                // make top of clip work
+                translate([bushing_t+clip_t, bushing_l/2-e, bushing_d/2])
+                    cube([bushing_d-2*clip_t, clip_center_l+2*e, bushing_d]);
                 // rail through the whole thing
                 translate([bushing_d/2+bushing_t, -e, bushing_t+rail_d/2])
                     rotate([-90, 0, 0])
                     cylinder(d=rail_d, h=bushing_l+2*bushing_t+2*e, $fn=60);
-                // insets to hold bushings in place
+                // bushing outer diameter
                 translate([bushing_d/2+bushing_t, bushing_t, bushing_t+rail_d/2])
                     rotate([-90, 0, 0])
-                cylinder(d1=bushing_d, d2=bushing_d2, h=bushing_l, $fn=60);
+                cylinder(d=bushing_d, h=bushing_l, $fn=60);
             }
         }
     }
