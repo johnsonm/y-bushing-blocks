@@ -9,13 +9,15 @@
 // is a common length) and diameters (they may not have a tapered end)
 bushing_l=30; // Length of bushing: [30:Graphite_Inclusions 15:Oil_Impregnated_Bronze]
 bushing_d=12; // Bushing diameter
+block_distance=26; // Distance between blocks installed on printer
+
 bushing_t=2;
 rail_d=9; // leave some room around 8mm rail to avoid over-constraint
 clip_t=0.5;
 clip_center_l=4;
 screw_d=3.4; // tap for M4 screws — smaller hole than tapping AL
 screw_x=24; // distance between screw centers short dimension
-screw_y_long=2*24 + 26; // 2 * 24 (center to far edge) + 26 (between)
+screw_y_long=2*24 + block_distance; // 2 * 24 (center to far edge) + 26 (between)
 screw_y_short=18;
 base_thickness=5.5;
 edge_offset=screw_d/2+3;
