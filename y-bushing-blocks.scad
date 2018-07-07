@@ -7,10 +7,10 @@
 // bushings with graphite inserts. It can be adjusted for smaller 8mm
 // oil-impregnated bronze bushings by changing the bushing length (15mm
 // is a common length) and diameters (they may not have a tapered end)
-rail_d=9; // leave some room around 8mm rail
-bushing_d=12;
-bushing_l=30;
+bushing_l=30; // Length of bushing: [30:Graphite_Inclusions 15:Oil_Impregnated_Bronze]
+bushing_d=12; // Bushing diameter
 bushing_t=2;
+rail_d=9; // leave some room around 8mm rail to avoid over-constraint
 clip_t=0.5;
 clip_center_l=4;
 screw_d=3.4; // tap for M4 screws — smaller hole than tapping AL
