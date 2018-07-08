@@ -9,23 +9,42 @@
 // https://www.ebay.com/itm/JDB-Oilless-Graphite-Lubricating-Brass-Bearing-Bushing-Sleeve/142771728854?var=441776630372&hash=item213ddbb1d6:m:mp4EiNuPnJOZJdIyJrTz7tQ
 // https://www.amazon.com/Micromake-Printer-Ultimaker-Graphite-Bearing/dp/B06XV28WHG
 // https://www.amazon.com/uxcell-Self-lubricating-Bushing-Sleeve-Bearings/dp/B076P9PD2B
-bushing_l=30; // Length of bushing: [10-30]
-bushing_d=12; // Bushing diameter
-block_distance=26; // Distance between blocks installed on printer
 
-bushing_t=2;
-rail_d=9; // leave some room around 8mm rail to avoid over-constraint
+// Length of bushing
+bushing_l=30; // [8:30]
+// Bushing diameter
+bushing_d=12;
+// Distance between blocks installed on printer
+block_distance=26;
+
+// holes for rail, about 1mm larger than rail but smaller than bushing_d
+rail_d=9;
+
+// clip opening distance radius less than bushing_d — larger needs tougher plastic that bends
 clip_t=0.5;
+// length of clip section; the longer this is the more likely the system is to bind
 clip_center_l=4;
-screw_d=3.4; // tap for M4 screws — smaller hole than tapping AL
-screw_x=24; // distance between screw centers short dimension
-screw_y_long=2*24 + block_distance; // 2 * 24 (center to far edge) + 26 (between)
+
+// thickness of bushing end constraint blocks
+bushing_t=2;
+// Diameter of screw holes; 3.4 mm to tap for default M4 screws
+screw_d=3.4;
+// Distance between X screw centers in the short dimension
+screw_x=24;
+// Distance between Y screw centers in long dimension: two centers to far edges plus distance
+screw_y_long=2*24 + block_distance;
+// Distance between Y screw centers on a single block
 screw_y_short=18;
+// Thickness of base block; 5.5 to mimic SCS8UU
 base_thickness=5.5;
-edge_offset=screw_d/2+3;
+// Thickness between inner edge of screw hole and outer edge of base block
+edge_thickness=3;
+edge_offset=screw_d/2+edge_thickness;
+// Print the blocks this far apart
 separation=2;
 
-e=0.01;
+// Used to keep surfaces non-coincident for preview display
+e=0.01 * 1;
 
 module base(screw_y) {
     difference() {
