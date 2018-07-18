@@ -12,12 +12,14 @@
 
 // Length of bushing
 bushing_l=30; // [8:30]
-// Bushing diameter
+// Bushing outer diameter
 bushing_d=12;
+// Bushing inner diameter
+bushing_id=8;
 // Distance between blocks installed on printer
 block_distance=26;
 
-// holes for rail, about 1mm larger than rail but smaller than bushing_d
+// holes for rail, larger than rail but smaller than bushing_d
 rail_d=9;
 
 // clip opening distance radius less than bushing_d — larger needs tougher plastic that bends
@@ -42,6 +44,8 @@ edge_thickness=3;
 edge_offset=screw_d/2+edge_thickness;
 // Print the blocks this far apart
 separation=2;
+// Offset the clips this far from the end on the long block by this factor of bushing length from the end
+clip_offset=0.80;
 
 // Used to keep surfaces non-coincident for preview display
 e=0.01 * 1;
@@ -49,21 +53,21 @@ e=0.01 * 1;
 module base(screw_y) {
     difference() {
         hull() {
-            y=max(screw_y/2, bushing_l/2+bushing_t-edge_offset);
+            y=max(screw_y[0]/2, bushing_l/2+bushing_t-edge_offset);
             for (sign=[[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
                 translate([sign[0]*screw_x/2, sign[1]*y, 0])
                     cylinder(d=edge_offset*2, h=base_thickness, $fn=20);
             }
         }
         union() {
-            for (sign=[[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
-                translate([sign[0]*screw_x/2, sign[1]*screw_y/2, -e])
+            for (y=screw_y, sign=[[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+                translate([sign[0]*screw_x/2, sign[1]*y/2, -e])
                     cylinder(d=screw_d, h=base_thickness+2*e, $fn=30);
             }
         }
     }
 }
-module clip() {
+module clip(offset=0.50) {
     translate([-(bushing_d/2+bushing_t), -(bushing_l/2+bushing_t), base_thickness]) {
         hull_w=bushing_d+2*bushing_t;
         hull_l=bushing_l+2*bushing_t;
@@ -80,12 +84,12 @@ module clip() {
             union() {
                 // cut out top middle of cube either side of side clip
                 translate([-e, bushing_t, 0])
-                    cube([bushing_d+2*bushing_t+2*e, bushing_l/2-clip_center_l/2, bushing_d+bushing_t+e]);
-                translate([-e, bushing_l/2+clip_center_l, 0])
-                    cube([hull_w+2*e, bushing_l/2-clip_center_l/2, bushing_d+bushing_t+e]);
+                    cube([bushing_d+2*bushing_t+2*e, (bushing_l*(1-offset))-clip_center_l/2, bushing_d+bushing_t+e]);
+                translate([-e, (bushing_l*(1-offset))+clip_center_l, 0])
+                    cube([hull_w+2*e, (bushing_l*offset)-clip_center_l/2, bushing_d+bushing_t+e]);
                 // make top of clip work
-                translate([bushing_t+clip_t, bushing_l/2-e, bushing_d/2])
-                    cube([bushing_d-2*clip_t, clip_center_l+2*e, bushing_d]);
+                translate([bushing_t+clip_t, bushing_t+e, bushing_d/2])
+                    cube([bushing_d-2*clip_t, bushing_l-2*e, bushing_d]);
                 // rail through the whole thing
                 translate([bushing_d/2+bushing_t, -e, bushing_t+rail_d/2])
                     rotate([-90, 0, 0])
@@ -98,18 +102,21 @@ module clip() {
         }
         %translate([bushing_d/2+bushing_t, bushing_t, bushing_t+rail_d/2])
             rotate([-90, 0, 0])
-            cylinder(d=bushing_d, h=bushing_l, $fn=60);
+            difference() {
+                cylinder(d=bushing_d, h=bushing_l, $fn=60);
+                translate([0, 0, -e]) cylinder(d=bushing_id, h=bushing_l+2*e, $fn=60);
+            }
     }
 }
 module long() {
-    base(screw_y_long);
+    base([screw_y_long, screw_y_short]);
     translate([0, bushing_l/2-screw_y_long/2-edge_offset+bushing_t])
-        clip();
+        clip(offset=clip_offset);
     translate([0, -bushing_l/2+screw_y_long/2+edge_offset-bushing_t])
-        clip();
+        clip(offset=1-clip_offset);
 }
 module short() {
-    base(screw_y_short);
+    base([screw_y_short]);
     clip();
 }
 //long();
