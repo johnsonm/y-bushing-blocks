@@ -11,16 +11,18 @@
 // https://www.amazon.com/uxcell-Self-lubricating-Bushing-Sleeve-Bearings/dp/B076P9PD2B
 
 // Length of bushing
-bushing_l=30; // [8:30]
+bushing_l=15; // [8:30]
 // Bushing outer diameter
 bushing_d=12;
+// Base extra clearance around bushing
+bushing_clearance_r=0.33;
 // Bushing inner diameter
 bushing_id=8;
 // Distance between blocks installed on printer
 block_distance=26;
 
 // holes for rail, larger than rail but smaller than bushing_d
-rail_d=9;
+rail_d=8.75;
 
 // clip opening distance radius less than bushing_d — larger needs tougher plastic that bends
 clip_t=0.5;
@@ -51,9 +53,10 @@ clip_offset=0.80;
 e=0.01 * 1;
 
 module base(screw_y) {
+    base_y=max(screw_y[0]/2, bushing_l/2+bushing_t-edge_offset);
     difference() {
         hull() {
-            y=max(screw_y[0]/2, bushing_l/2+bushing_t-edge_offset);
+            y=base_y;
             for (sign=[[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
                 translate([sign[0]*screw_x/2, sign[1]*y, 0])
                     cylinder(d=edge_offset*2, h=base_thickness, $fn=20);
@@ -63,6 +66,16 @@ module base(screw_y) {
             for (y=screw_y, sign=[[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
                 translate([sign[0]*screw_x/2, sign[1]*y/2, -e])
                     cylinder(d=screw_d, h=base_thickness+2*e, $fn=30);
+            }
+            d=bushing_d+2*bushing_clearance_r;
+            signs=len(screw_y)==1?[0]:[-1,1];
+            for (sign=signs) {
+                l=sign==1?bushing_l:0;
+                ty=sign*(base_y+edge_offset-(l+bushing_t));
+                y=ty==0?-bushing_l/2:ty;
+                translate([0, y, base_thickness+bushing_d/2])
+                    rotate([-90, 0, 0])
+                    cylinder(d=d, h=bushing_l, $fn=30);
             }
         }
     }
@@ -82,14 +95,17 @@ module clip(offset=0.50) {
                     cylinder(d=edge_offset, h=hull_l, $fn=24);
             }
             union() {
-                // cut out top middle of cube either side of side clip
+                // cut out middle of cube either side of side clip
                 translate([-e, bushing_t, 0])
                     cube([bushing_d+2*bushing_t+2*e, (bushing_l*(1-offset))-clip_center_l/2, bushing_d+bushing_t+e]);
                 translate([-e, (bushing_l*(1-offset))+clip_center_l, 0])
                     cube([hull_w+2*e, (bushing_l*offset)-clip_center_l/2, bushing_d+bushing_t+e]);
-                // make top of clip work
+                // cut out top middle of clip section
                 translate([bushing_t+clip_t, bushing_t+e, bushing_d/2])
                     cube([bushing_d-2*clip_t, bushing_l-2*e, bushing_d]);
+                // cut out bottom middle of clip section, slightly thicker for strength
+                translate([bushing_t+2*clip_t, bushing_t+e, 0])
+                    cube([bushing_d-4*clip_t, bushing_l-2*e, bushing_d/2]);
                 // rail through the whole thing
                 translate([bushing_d/2+bushing_t, -e, bushing_t+rail_d/2])
                     rotate([-90, 0, 0])
