@@ -10,12 +10,12 @@
 // https://www.amazon.com/Micromake-Printer-Ultimaker-Graphite-Bearing/dp/B06XV28WHG
 // https://www.amazon.com/uxcell-Self-lubricating-Bushing-Sleeve-Bearings/dp/B076P9PD2B
 
-// Length of bushing
-bushing_l=15; // [8:30]
+// Length of bushing, plus room for variation in plastic
+bushing_l=15.5; // [8:30]
 // Bushing outer diameter
 bushing_d=12;
-// Base extra clearance around bushing
-bushing_clearance_r=0.33;
+// Extra clearance around bushing
+bushing_clearance_r=0.16;
 // Bushing inner diameter
 bushing_id=8;
 // Distance between blocks installed on printer
@@ -67,7 +67,7 @@ module base(screw_y) {
                 translate([sign[0]*screw_x/2, sign[1]*y/2, -e])
                     cylinder(d=screw_d, h=base_thickness+2*e, $fn=30);
             }
-            d=bushing_d+2*bushing_clearance_r;
+            d=bushing_d+4*bushing_clearance_r; // extra clearance in base
             signs=len(screw_y)==1?[0]:[-1,1];
             for (sign=signs) {
                 l=sign==1?bushing_l:0;
@@ -84,6 +84,7 @@ module clip(offset=0.50) {
     translate([-(bushing_d/2+bushing_t), -(bushing_l/2+bushing_t), base_thickness]) {
         hull_w=bushing_d+2*bushing_t;
         hull_l=bushing_l+2*bushing_t;
+        axis_z=bushing_t+rail_d/2;
         difference() {
             hull() {
                 cube([hull_w, hull_l, bushing_d+bushing_t-edge_offset]);
@@ -107,13 +108,13 @@ module clip(offset=0.50) {
                 translate([bushing_t+2*clip_t, bushing_t+e, 0])
                     cube([bushing_d-4*clip_t, bushing_l-2*e, bushing_d/2]);
                 // rail through the whole thing
-                translate([bushing_d/2+bushing_t, -e, bushing_t+rail_d/2])
+                translate([bushing_d/2+bushing_t, -e, axis_z])
                     rotate([-90, 0, 0])
                     cylinder(d=rail_d, h=bushing_l+2*bushing_t+2*e, $fn=60);
                 // bushing outer diameter
-                translate([bushing_d/2+bushing_t, bushing_t, bushing_t+rail_d/2])
+                translate([bushing_d/2+bushing_t, bushing_t, axis_z])
                     rotate([-90, 0, 0])
-                    cylinder(d=bushing_d, h=bushing_l, $fn=60);
+                    cylinder(d=bushing_d+2*bushing_clearance_r, h=bushing_l, $fn=60);
             }
         }
         %translate([bushing_d/2+bushing_t, bushing_t, bushing_t+rail_d/2])
