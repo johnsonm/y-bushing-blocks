@@ -35,7 +35,7 @@ bracket_screw_tap_d=bracket_screw_d-0.5;
 // thickness (Y) of bushing end constraint blocks
 bushing_t=2;
 // thickness (X) of bracket clips outside bushing diameter
-bracket_thickness=bracket_screw_d*2;
+bracket_thickness=bracket_screw_d*2+2;
 // Diameter of base screw holes; 3.4 mm to tap for default M4 screws
 screw_d=3.4;
 // Distance between X screw centers in the short dimension
@@ -140,7 +140,7 @@ module bracket(clip=false) {
     translate([0, -bracket_thickness/2, z])
     difference() {
         translate([-l/2, 0, -bracket_thickness/2])
-            cube([l, bracket_thickness, d/2+bracket_thickness/2]);
+            cube([l, bracket_thickness, d/2+bracket_thickness/2-bushing_clearance_r]);
         union() {
             // space for bushing
             translate([0, -e, bushing_d/2+bushing_clearance_r])
@@ -173,9 +173,9 @@ module short_clip() {
 module long_bracket() {
     translate([-(screw_x/2+edge_offset+separation/2), 0, 0]) {
         base([screw_y_long, screw_y_short], false);
-        translate([0, bushing_l/2-screw_y_long/2-edge_offset+bushing_t, base_thickness])
+        translate([0, bushing_l/2+bracket_thickness/2-screw_y_long/2-edge_offset, base_thickness])
             bracket();
-        translate([0, -bushing_l/2+screw_y_long/2+edge_offset-bushing_t, base_thickness])
+        translate([0, -bushing_l/2-bracket_thickness/2+screw_y_long/2+edge_offset, base_thickness])
             bracket();
     }
     y=bushing_d/2+bushing_clearance_r+bracket_thickness+separation/2;
