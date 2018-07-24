@@ -140,7 +140,7 @@ module bracket(clip=false) {
     translate([0, -bracket_thickness/2, z])
     difference() {
         translate([-l/2, 0, -bracket_thickness/2])
-            cube([l, bracket_thickness, d/2+bracket_thickness/2-bushing_clearance_r]);
+            cube([l, bracket_thickness, d/2+bracket_thickness/2-bushing_clearance_r*2]);
         union() {
             // space for bushing
             translate([0, -e, bushing_d/2+bushing_clearance_r])
