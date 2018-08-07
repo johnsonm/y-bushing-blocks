@@ -36,6 +36,8 @@ bracket_screw_tap_d=bracket_screw_d-0.5;
 bushing_t=2;
 // thickness (X) of bracket clips outside bushing diameter
 bracket_thickness=bracket_screw_d*2+2;
+// Y length of bracket
+bracket_l=20;
 // Diameter of base screw holes; 3.4 mm to tap for default M4 screws
 screw_d=3.4;
 // Distance between X screw centers in the short dimension
@@ -134,27 +136,28 @@ module clip(offset=0.50) {
 }
 module bracket(clip=false) {
     d=bushing_d+bushing_clearance_r*2;
-    l=d+2*bracket_thickness;
+    w=d+2*bracket_thickness;
+    l=bracket_l;
     z=clip?bracket_thickness/2:0;
     screw_d=clip?bracket_screw_d+2*bushing_clearance_r:bracket_screw_tap_d;
-    translate([0, -bracket_thickness/2, z])
+    translate([0, -l/2, z])
     difference() {
-        translate([-l/2, 0, -bracket_thickness/2])
-            cube([l, bracket_thickness, d/2+bracket_thickness/2-bushing_clearance_r*2]);
+        translate([-w/2, 0, -bracket_thickness/2])
+            cube([w, l, d/2+bracket_thickness/2-bushing_clearance_r*2]);
         union() {
             // space for bushing
             translate([0, -e, bushing_d/2+bushing_clearance_r])
                 rotate([-90, 0, 0])
-                cylinder(d=d, h=bracket_thickness+2*e, $fn=60);
+                cylinder(d=d, h=l+2*e, $fn=60);
             // screw holes
-            translate([d/2+bracket_thickness/2, bracket_thickness/2, -(e+bracket_thickness/2)])
+            translate([d/2+bracket_thickness/2, l/2, -(e+bracket_thickness/2)])
                 cylinder(d=screw_d, h=d/2+bracket_thickness+2*e, $fn=12);
-            translate([-(d/2+bracket_thickness/2), bracket_thickness/2, -(e+bracket_thickness/2)])
+            translate([-(d/2+bracket_thickness/2), l/2, -(e+bracket_thickness/2)])
                 cylinder(d=screw_d, h=d/2+bracket_thickness+2*e, $fn=12);
             // screw heads — these show up only for the clip side
-            translate([d/2+bracket_thickness/2, bracket_thickness/2, -(e+bracket_thickness/2)])
+            translate([d/2+bracket_thickness/2, l/2, -(e+bracket_thickness/2)])
                 cylinder(d1=bracket_screw_d*2, d2=0, h=screw_d, $fn=12);
-            translate([-(d/2+bracket_thickness/2), bracket_thickness/2, -(e+bracket_thickness/2)])
+            translate([-(d/2+bracket_thickness/2), l/2, -(e+bracket_thickness/2)])
                 cylinder(d1=bracket_screw_d*2, d2=0, h=screw_d, $fn=12);
         }
     }
@@ -173,16 +176,16 @@ module short_clip() {
 module long_bracket() {
     translate([-(screw_x/2+edge_offset+separation/2), 0, 0]) {
         base([screw_y_long, screw_y_short], false);
-        translate([0, bushing_l/2+bracket_thickness/2-screw_y_long/2-edge_offset, base_thickness])
+        translate([0, bushing_l/2+bracket_l/2-screw_y_long/2-edge_offset, base_thickness])
             bracket();
-        translate([0, -bushing_l/2-bracket_thickness/2+screw_y_long/2+edge_offset, base_thickness])
+        translate([0, -bushing_l/2-bracket_l/2+screw_y_long/2+edge_offset, base_thickness])
             bracket();
     }
     y=bushing_d/2+bushing_clearance_r+bracket_thickness+separation/2;
-    translate([(bracket_thickness/2+separation/2), y, 0])
+    translate([(bracket_l/2+separation/2), y, 0])
         rotate([0, 0, 90])
         bracket(true);
-    translate([(bracket_thickness/2+separation/2), -y, 0])
+    translate([(bracket_l/2+separation/2), -y, 0])
         rotate([0, 0, 90])
         bracket(true);
 }
@@ -190,10 +193,11 @@ module short_bracket() {
     base([screw_y_short]);
     translate([0, 0, base_thickness])
         bracket();
-    translate([0, screw_y_short/2+edge_offset+separation+bracket_thickness/2])
+    translate([0, screw_y_short/2+edge_offset+separation+bracket_l/2])
         bracket(true);
 }
 rotate([0, 0, 90]) long_bracket();
+//bracket();
 //short_bracket();
 //long_clip();
 //translate([-(screw_x/2+edge_offset+separation/2), 0, 0])
